@@ -1,12 +1,13 @@
+var settings = require('./etc/settings').settings;
 var queue = require('../queuer/lib/queue');
-var q = queue.getQueue('http://127.0.0.1:3000/queue', 'weibo_send_hangqing');
+var q = queue.getQueue(settings.queue.host, settings.queue.contentqueue);
 var eyes = require('eyes');
 var express = require('express');
 var request = require('request');
 var app = express.createServer();
 app.use(express.bodyParser());
 var MySqlClient = require('./lib/mysql').MySqlClient;
-var mysql = new MySqlClient('172.16.33.237', 3306, 'stockradar', 'stockradar', 'stock_radar');
+var mysql = new MySqlClient(settings.mysql.host, settings.mysql.port, settings.mysql.username, settings.mysql.password, settings.mysql.database);
 
 app.post('/hangqing', function(req, res) {
     var myDate = new Date();
@@ -40,7 +41,7 @@ app.post('/hangqing', function(req, res) {
     var content = '【'+req.body.name+showtype+'播报】昨收：'+req.body.close+'，今开：'+req.body.open+'，最高：'+req.body.high+'，最低：'+req.body.low+'，最新：'+req.body.price+'，涨跌额：'+req.body.updown+'，涨跌幅：'+req.body.markup+'%，总量：'+volum+'，金额：'+amount+'。';
     if( myHour > 11 && req.body.type == 0) {
         var stockcode = req.body.stockcode.substr(-6);
-        request({ uri:'http://172.16.39.102/interface_zjlxjiekou.php?code='+stockcode }, function (error, response, body) {
+        request({ uri:settings.zjlx+stockcode }, function (error, response, body) {
             if(error) {
                 console.log('request error:'+stockcode);
                 res.end('error! request error:'+stockcode);
@@ -55,7 +56,7 @@ app.post('/hangqing', function(req, res) {
                 content += '【资金流向】净流量:' + oData.stock.fundquantity + '万元，其中机构：'+oData.stock.jigou.jigouquantity+'万元，大户'+oData.stock.dahu.dahuquantity+'万元，散户'+oData.stock.sanhu.sanhuquantity+'万元。';
                 mysql.insert_micro_blog(req.body.stockcode, iTimestring, content, function(blogid) {
                     if(blogid > 0) {
-                        q.enqueue('mysql://172.16.33.237:3306/stock_radar?micro_blog#'+blogid);
+                        q.enqueue('mysql://'+settings.mysql.host+':'+settings.mysql.port+'/'+settings.mysql.database+'?micro_blog#'+blogid);
                         res.end('success');
                     } else {
                         res.end('error! insert error:'+stockcode);
@@ -70,7 +71,7 @@ app.post('/hangqing', function(req, res) {
     } else {
         mysql.insert_micro_blog(req.body.stockcode, iTimestring, content, function(blogid) {
             if(blogid > 0) {
-                q.enqueue('mysql://172.16.33.237:3306/stock_radar?micro_blog#'+blogid);
+                q.enqueue('mysql://'+settings.mysql.host+':'+settings.mysql.port+'/'+settings.mysql.database+'?micro_blog#'+blogid);
                 res.end('success');
             } else {
                 res.end('error! insert error:'+stockcode);
