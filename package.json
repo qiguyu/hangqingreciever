@@ -1,0 +1,20 @@
+{
+    "name": "reciever",
+    "version": "0.1.0",
+    "description": "hangqing reciever",
+    "author": "qiguyu <yoyo_524@hotmail.com>",
+    "dependencies": {
+        "express": ">= 2.5.2",
+        "request": ">= 2.2.9",
+        "mysql": ">= 0.9.5",
+        "eyes": ">= 0.1.6",
+        "devent": "git@github.com:qiguyu/hangqingreciever.git"
+    },
+    "main": "index",
+    "scripts": {
+        "start": "node reciver.js"
+    },
+    "engines": {
+        "node": "0.6.x"
+    }
+}
