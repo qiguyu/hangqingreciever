@@ -2,7 +2,6 @@ var settings = require('./etc/settings');
 var queue = require('queuer');
 var q = queue.getQueue(settings.queue.host, settings.queue.contentqueue);
 var request = require('request');
-var eyes = require('eyes');
 var express = require('express');
 var app = express.createServer();
 app.use(express.bodyParser());
@@ -39,8 +38,7 @@ app.post('/hangqing', function(req, res) {
     }
     volum += '元';
     var content = '【'+req.body.name+showtype+'播报】昨收：'+req.body.close+'，今开：'+req.body.open+'，最高：'+req.body.high+'，最低：'+req.body.low+'，最新：'+req.body.price+'，涨跌额：'+req.body.updown+'，涨跌幅：'+req.body.markup+'%，总量：'+amount+'，金额：'+volum+'。';
-    console.log(content);
-    if( myHour > 11 && req.body.type == 0) {
+    if( myHour > 10 && req.body.type == 0) {
         var stockcode = req.body.stockcode.substr(-6);
         request({ uri:settings.zjlx+stockcode }, function (error, response, body) {
             if(error) {
