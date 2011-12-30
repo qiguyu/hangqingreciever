@@ -1,6 +1,6 @@
 var settings = require('./etc/settings');
-var queue = require('queuer');
-var q = queue.getQueue(settings.queue.host, settings.queue.contentqueue);
+//var queue = require('queuer');
+//var q = queue.getQueue(settings.queue.host, settings.queue.contentqueue);
 var request = require('request');
 var express = require('express');
 var app = express.createServer();
@@ -55,7 +55,7 @@ app.post('/hangqing', function(req, res) {
                 content += '【资金流向】净流量:' + oData.stock.fundquantity + '万元，其中机构：'+oData.stock.jigou.jigouquantity+'万元，大户'+oData.stock.dahu.dahuquantity+'万元，散户'+oData.stock.sanhu.sanhuquantity+'万元。';
                 mysql.insert_micro_blog(req.body.stockcode, iTimestring, content, function(blogid) {
                     if(blogid > 0) {
-                        q.enqueue('mysql://'+settings.mysql.host+':'+settings.mysql.port+'/'+settings.mysql.database+'?micro_blog#'+blogid);
+                        //q.enqueue('mysql://'+settings.mysql.host+':'+settings.mysql.port+'/'+settings.mysql.database+'?micro_blog#'+blogid);
                         res.end('success');
                     } else {
                         res.end('error! insert error:'+stockcode);

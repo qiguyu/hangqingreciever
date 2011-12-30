@@ -13,7 +13,7 @@ cp settings.original.json settings.json
 vi settings.json
 
 #Step 5
-#settings.json ËµÃ÷
+#settings.json è¯´æ˜
 {
   "queue_server" : { //Queue Server
     "host" : "127.0.0.1", //Queue Server IP
@@ -21,9 +21,9 @@ vi settings.json
     "queue_path" : "queue" //Queue Server Path
   },
   "mysql" : {
-    "172.16.33.237:3306:stock_radar" : { //ÈÎÎñURIÖĞµÄip,¶Ë¿ÚºÍdatabase
-      "username" : "stockradar",//ÈÎÎñÖĞÊı¾İ¿âÓÃ»§Ãû
-      "password" : "stockradar"//ÈÎÎñÖĞÊı¾İ¿âÓÃÃÜÂë
+    "172.16.33.237:3306:stock_radar" : { //ä»»åŠ¡URIä¸­çš„ip,ç«¯å£å’Œdatabase
+      "username" : "stockradar",//ä»»åŠ¡ä¸­æ•°æ®åº“ç”¨æˆ·å
+      "password" : "stockradar"//ä»»åŠ¡ä¸­æ•°æ®åº“ç”¨å¯†ç 
     }
   }
 }
