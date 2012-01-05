@@ -30,4 +30,4 @@ vi settings.json
 
 
 #Step 6
-node reciver.js  
+node receiver.js
