@@ -1,5 +1,5 @@
 var fs = require('fs');
-var settings = JSON.parse(fs.readFileSync('./etc/settings.json', 'utf8'));
+var settings = JSON.parse(fs.readFileSync(__dirname + '/etc/settings.json', 'utf8'));
 var queue = require('queuer');
 var q = queue.getQueue(settings.queue.host, settings.queue.contentqueue);
 var request = require('request');
@@ -17,7 +17,17 @@ app.post('/hangqing', function(req, res) {
         if(stockcode > 300010 && stockcode < 300030) {
             var myDate = new Date();
             var iTimestring = Date.parse(myDate) / 1000;
+            var myYear = myDate.getFullYear() + '';
+            var myMonth = myDate.getMonth() + 1;
+            if(myMonth < 10) {
+                myMonth = '0' + myMonth;
+            }
+            var myDay = myDate.getDate();
+            if(myDay < 10) {
+                myDay = '0' + myDay;
+            }
             var myHour = myDate.getHours();
+            var sToday = myYear + myMonth + myDay;
             if(myHour < 11) {
                 var showtype = '开盘';
             } else if(myHour > 14) {
@@ -43,7 +53,18 @@ app.post('/hangqing', function(req, res) {
                 volum += '万';
             }
             volum += '元';
-            var content = '【'+req.body.name+showtype+'播报】昨收：'+req.body.close+'，今开：'+req.body.open+'，最高：'+req.body.high+'，最低：'+req.body.low+'，最新：'+req.body.price+'，涨跌额：'+req.body.updown+'，涨跌幅：'+req.body.markup+'%，总量：'+amount+'，金额：'+volum+'。';
+            var openupdown = req.body.open - req.body.close;
+            var openmarkup = (req.body.open - req.body.close) * 100 / req.body.close;
+            openmarkup = openmarkup.toFixed(2);
+            var content = '【'+showtype+'播报】最新：'+req.body.price+'（'+req.body.updown+'，'+req.body.markup+'%），今开：'+req.body.open+'（'+openupdown.toFixed(2)+'，'+openmarkup+'%）';
+            if(myHour > 10) {
+                var highmarkup = (req.body.high - req.body.close) * 100 / req.body.close;
+                highmarkup = highmarkup.toFixed(2);
+                var lowmarkup = (req.body.low - req.body.close) * 100 / req.body.close;
+                lowmarkup = lowmarkup.toFixed(2);
+                content += '，最高：'+req.body.high+'（'+highmarkup+'%），最低：'+req.body.low+'（'+lowmarkup+'%）';
+            }
+            content += '，成交：'+amount+'（'+volum+'），换手率：'+req.body.swaprate+'%';
             if( myHour > 10 && req.body.type == 0) {
                 var stockcode = req.body.stockcode.substr(-6);
                 request({ uri:settings.zjlx+stockcode }, function (error, response, body) {
@@ -52,7 +73,9 @@ app.post('/hangqing', function(req, res) {
                     }
                     try {
                         var oData = JSON.parse(body);
-                        content += '【资金流向】净流量:' + oData.stock.fundquantity + '万元，其中机构：'+oData.stock.jigou.jigouquantity+'万元，大户'+oData.stock.dahu.dahuquantity+'万元，散户'+oData.stock.sanhu.sanhuquantity+'万元。';
+                        if(oData.message == undefined || oData.stock.datetime.substr(0, 8) == sToday) {
+                            content += '【资金流向】净流量:' + oData.stock.fundquantity + '万元（机构：'+oData.stock.jigou.jigouquantity+'万元，大户'+oData.stock.dahu.dahuquantity+'万元，散户'+oData.stock.sanhu.sanhuquantity+'万元）';
+                        }
                     } catch(err) {
                         console.log('parse error12:'+stockcode);
                     }
@@ -75,10 +98,7 @@ app.post('/hangqing', function(req, res) {
                     }
                 });
             }
-        } else {
-            res.end('success');
         }
     }
 });
 app.listen(9559);
-
