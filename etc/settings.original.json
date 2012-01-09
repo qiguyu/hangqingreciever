@@ -1,17 +1,17 @@
 {
   "queue" : {
     "host" : "http://127.0.0.1:3000/queue",
-    "contentqueue":"article_content"
+    "contentqueue":"weibo_send"
   },
   "mysql" : {
   	"host":"172.16.33.237",
   	"port":3306,  	
-  	"username" : "stockradar",
+  	"user" : "stockradar",
     "password" : "stockradar",
     "database": "stock_radar" 
   },
   "log" : {
     "file" : "log/reciever.log"
   },
-  "zjlx" : "http://172.16.39.102/interface_zjlxjiekou.php?code="
+  "zjlx" : "http://172.16.39.102/interface_zjlxjiekou.php?slishi=1&block=1&sday=1&code="
 }

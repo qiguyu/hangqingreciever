@@ -15,17 +15,21 @@ vi settings.json
 #Step 5
 #settings.json 说明
 {
-  "queue_server" : { //Queue Server
-    "host" : "127.0.0.1", //Queue Server IP
-    "port" : 3000, //Queue Server Port
-    "queue_path" : "queue" //Queue Server Path
+  "queue" : {
+    "host" : "http://127.0.0.1:3000/queue",//队列地址
+    "contentqueue":"weibo_send"//队列名称
   },
   "mysql" : {
-    "172.16.33.237:3306:stock_radar" : { //任务URI中的ip,端口和database
-      "username" : "stockradar",//任务中数据库用户名
-      "password" : "stockradar"//任务中数据库用密码
-    }
-  }
+  	"host":"localhost",
+  	"port":3306,  	
+  	"user" : "root",
+    "password" : "123456",
+    "database": "stock_radar" //数据库名
+  },
+  "log" : {
+    "file" : "log/reciever.log"
+  },
+  "zjlx" : "http://172.16.39.102/interface_zjlxjiekou.php?slishi=1&block=1&sday=1&code="//资金流向接口地址
 }
 
 
