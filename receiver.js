@@ -6,21 +6,16 @@ var app = express.createServer();
 
 app.use(express.bodyParser());
 app.post('/hangqing', function(req, res) {
-    if(req.body.stockcode == undefined || req.body.name == undefined) {
+    var myDate = new Date();
+    var myHour = myDate.getHours();
+    var myMin = myDate.getMinutes();
+    if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined) {
         res.end('error! invalid stock code or name');
+    } else if((myHour == 15 && myMin > 30) || myHour > 15) {
+        res.end('too late!');
     } else {
-        var myDate = new Date();
-        var myYear = myDate.getFullYear() + '';
-        var myMonth = myDate.getMonth() + 1;
-        if(myMonth < 10) {
-            myMonth = '0' + myMonth;
-        }
-        var myDay = myDate.getDate();
-        if(myDay < 10) {
-            myDay = '0' + myDay;
-        }
-        var myHour = myDate.getHours();
-        var sToday = myYear + myMonth + myDay;
+        var sToday = req.body.date.substr(0, 8);
+        var myHour = parseInt(req.body.date.substr(8, 2));
         if(myHour < 11) {
             var showtype = '开盘';
         } else if(myHour > 13) {
