@@ -1,6 +1,5 @@
 var settings = require('./etc/settings.json');
 var request = require('request');
-var eyes = require('eyes');
 var weibo = require('./lib/weibo');
 var express = require('express');
 var app = express.createServer();
@@ -24,7 +23,7 @@ app.post('/hangqing', function(req, res) {
         var sToday = myYear + myMonth + myDay;
         if(myHour < 11) {
             var showtype = '开盘';
-        } else if(myHour > 14) {
+        } else if(myHour > 13) {
             var showtype = '收盘';
         } else {
             var showtype = '午盘';
