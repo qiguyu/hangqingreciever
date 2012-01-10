@@ -11,8 +11,8 @@ app.post('/hangqing', function(req, res) {
     var myMin = myDate.getMinutes();
     if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined) {
         res.end('error! invalid stock code or name');
-    } else if((myHour == 15 && myMin > 30) || myHour > 15) {
-        res.end('too late!');
+    } else if(myHour > 15 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
+        res.end('not work now!');
     } else {
         var sToday = req.body.date.substr(0, 8);
         var myHour = parseInt(req.body.date.substr(8, 2));
