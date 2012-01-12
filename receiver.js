@@ -15,10 +15,10 @@ app.post('/hangqing', function(req, res) {
         res.end('not work now!');
     } else {
         var sToday = req.body.date.substr(0, 8);
-        var myHour = parseInt(req.body.date.substr(8, 2));
-        if(myHour < 11) {
+        var hqHour = parseInt(req.body.date.substr(8, 2));
+        if(hqHour < 11) {
             var showtype = '开盘';
-        } else if(myHour > 13) {
+        } else if(hqHour > 13) {
             var showtype = '收盘';
         } else {
             var showtype = '午盘';
@@ -27,19 +27,63 @@ app.post('/hangqing', function(req, res) {
         volum += '手';
         var amount = weibo.shortnumber(req.body.amount);
         amount += '元';
-        var openupdown = req.body.open - req.body.close;
-        var openmarkup = (req.body.open - req.body.close) * 100 / req.body.close;
-        openmarkup = openmarkup.toFixed(2);
-        var content = '【'+showtype+'播报】最新：'+req.body.price.toFixed(2)+'（'+req.body.updown.toFixed(2)+'，'+req.body.markup.toFixed(2)+'%），今开：'+req.body.open.toFixed(2)+'（'+openupdown.toFixed(2)+'，'+openmarkup+'%）';
-        if(myHour > 10) {
+        var openUpown = req.body.open - req.body.close;
+        var openMarkup = (req.body.open - req.body.close) * 100 / req.body.close;
+        openMarkup = openMarkup.toFixed(2);
+        var hqPrice = req.body.price;
+        if(typeof hqPrice == 'string') {
+            hqPrice = parseFloat(hqPrice);
+        }
+        var hqUpdown = req.body.updown;
+        if(typeof hqUpdown == 'string') {
+            hqUpdown = parseFloat(hqUpdown);
+        }
+        var hqMarkup = req.body.markup;
+        if(typeof hqMarkup == 'string') {
+            hqMarkup = parseFloat(hqMarkup);
+        }
+        var hqOpen = req.body.open;
+        if(typeof hqOpen == 'string') {
+            hqOpen = parseFloat(hqOpen);
+        }
+        var hqSwaprate = req.body.swaprate;
+        if(typeof hqSwaprate == 'string') {
+            hqSwaprate = parseFloat(hqSwaprate);
+        }
+        var hqOpenPrefix = '';
+        if(openUpown > 0) {
+            hqOpenPrefix = '+';
+        }
+        var hqPricePrefix = '';
+        if(hqUpdown > 0) {
+            hqPricePrefix = '+';
+        }
+        var content = '【'+showtype+'播报】最新：'+hqPrice.toFixed(2)+'（'+hqPricePrefix+hqUpdown.toFixed(2)+'，'+hqPricePrefix+hqMarkup.toFixed(2)+'%），今开：'+hqOpen.toFixed(2)+'（'+hqOpenPrefix+openUpown.toFixed(2)+'，'+hqOpenPrefix+openMarkup+'%）';
+        if(hqHour > 10) {
             var highmarkup = (req.body.high - req.body.close) * 100 / req.body.close;
             highmarkup = highmarkup.toFixed(2);
             var lowmarkup = (req.body.low - req.body.close) * 100 / req.body.close;
             lowmarkup = lowmarkup.toFixed(2);
-            content += '，最高：'+req.body.high.toFixed(2)+'（'+highmarkup+'%），最低：'+req.body.low.toFixed(2)+'（'+lowmarkup+'%）';
+            var hqHigh = req.body.high;
+            if(typeof hqHigh == 'string') {
+                hqHigh = parseFloat(hqHigh);
+            }
+            var hqLow = req.body.low;
+            if(typeof hqLow == 'string') {
+                hqLow = parseFloat(hqLow);
+            }
+            var hqHighPrefix = '';
+            if(highmarkup > 0) {
+                hqHighPrefix = '+';
+            }
+            var hqLowPrefix = '';
+            if(lowmarkup > 0) {
+                hqLowPrefix = '+';
+            }
+            content += '，最高：'+hqHigh.toFixed(2)+'（'+hqHighPrefix+highmarkup+'%），最低：'+hqLow.toFixed(2)+'（'+hqLowPrefix+lowmarkup+'%）';
         }
-        content += '，成交：'+volum+'（'+amount+'），换手率：'+req.body.swaprate.toFixed(2)+'%';
-        if( myHour > 10 && req.body.type == 1) {
+        content += '，成交：'+volum+'（'+amount+'），换手率：'+hqSwaprate.toFixed(2)+'%';
+        if( hqHour > 10 && req.body.type == 1) {
             var stockcode = req.body.stockcode.substr(-6);
             request({ uri:settings.zjlx+stockcode }, function (error, response, body) {
                 if(error || response.statusCode != 200) {
@@ -48,7 +92,23 @@ app.post('/hangqing', function(req, res) {
                 try {
                     var oData = JSON.parse(body);
                     if(oData.message == undefined || oData.stock.datetime.substr(0, 8) == sToday) {
-                        content += '【资金流向】净流量:' + oData.stock.fundquantity.toFixed(2) + '万元（机构：'+oData.stock.jigou.jigouquantity.toFixed(2)+'万元，大户'+oData.stock.dahu.dahuquantity.toFixed(2)+'万元，散户'+oData.stock.sanhu.sanhuquantity.toFixed(2)+'万元）';
+                        var zjQuantiti = oData.stock.fundquantity;
+                        if(typeof zjQuantiti == 'string') {
+                            zjQuantiti = parseFloat(zjQuantiti);
+                        }
+                        var zjJgQuantiti = oData.stock.jigou.jigouquantity;
+                        if(typeof zjJgQuantiti == 'string') {
+                            zjJgQuantiti = parseFloat(zjJgQuantiti);
+                        }
+                        var zjDhQuantiti = oData.stock.dahu.dahuquantity;
+                        if(typeof zjDhQuantiti == 'string') {
+                            zjDhQuantiti = parseFloat(zjDhQuantiti);
+                        }
+                        var zjShQuantiti = oData.stock.sanhu.sanhuquantity;
+                        if(typeof zjShQuantiti == 'string') {
+                            zjShQuantiti = parseFloat(zjShQuantiti);
+                        }
+                        content += '【资金流向】净流量：' + zjQuantiti.toFixed(2) + '万元（机构：'+zjJgQuantiti.toFixed(2)+'万元，大户：'+zjDhQuantiti.toFixed(2)+'万元，散户：'+zjJgQuantiti.toFixed(2)+'万元）';
                     }
                 } catch(err) {
                     console.log('parse error12:'+stockcode);
