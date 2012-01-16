@@ -9,7 +9,7 @@ app.post('/hangqing', function(req, res) {
     var myDate = new Date();
     var myHour = myDate.getHours();
     var myMin = myDate.getMinutes();
-    if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined) {
+    if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined || req.body.stockcode.length != 8) {
         res.end('error! invalid stock code or name');
     } else if(myHour > 15 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
         res.end('not work now!');
@@ -108,7 +108,7 @@ app.post('/hangqing', function(req, res) {
                         if(typeof zjShQuantiti == 'string') {
                             zjShQuantiti = parseFloat(zjShQuantiti);
                         }
-                        content += '【资金流向】净流量：' + zjQuantiti.toFixed(2) + '万元（机构：'+zjJgQuantiti.toFixed(2)+'万元，大户：'+zjDhQuantiti.toFixed(2)+'万元，散户：'+zjJgQuantiti.toFixed(2)+'万元）';
+                        content += '【资金流向】净流量：' + zjQuantiti.toFixed(2) + '万元（机构：'+zjJgQuantiti.toFixed(2)+'万元，大户：'+zjDhQuantiti.toFixed(2)+'万元，散户：'+zjShQuantiti.toFixed(2)+'万元）';
                     }
                 } catch(err) {
                     console.log('parse error12:'+stockcode);
@@ -133,7 +133,7 @@ app.post('/hangqing', function(req, res) {
     }
 });
 app.post('/weibo', function(req, res) {
-    if(req.body.stockcode == undefined || req.body.content == undefined) {
+    if(req.body.stockcode == undefined || req.body.content == undefined || req.body.stockcode.length != 8) {
         res.end('invalied stockcode or content!');
     } else {
         weibo.addWeibo(req.body.stockcode, req.body.content, function(blogid) {
