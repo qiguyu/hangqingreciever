@@ -13,5 +13,11 @@
     "log" : {
         "file" : "log/reciever.log"
     },
-    "zjlx" : "http://172.16.39.102/interface_zjlxjiekou.php?slishi=1&block=1&sday=1&code="
+    "zjlx" : {
+        "api" : "http://172.16.39.102/interface_zjlxjiekou.php?slishi=1&block=1&sday=1&code=",
+        "image" : "http://gupiao123.cn/stat/zjlx/"
+    },
+    "pic" : {
+        "folder" : "image"
+    }
 }
