@@ -128,7 +128,11 @@ app.post('/hangqing', function(req, res) {
                                         buffers[i].copy(buffer, pos);
                                         pos += buffers[i].length;
                                     }
-                                    fs.writeFile(myPic, buffer);
+                                    if(buffers.length != 0) {
+                                        fs.writeFile(myPic, buffer);
+                                    } else {
+                                        myPic = '';
+                                    }
                                     weibo.addWeibo(req.body.stockcode, content, myPic, function(blogid) {
                                         if(blogid > 0) {
                                             res.end('success');
