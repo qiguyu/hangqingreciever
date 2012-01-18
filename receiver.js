@@ -4,7 +4,6 @@ var weibo = require('./lib/weibo');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
-var eyes = require('eyes');
 var express = require('express');
 var app = express.createServer();
 
@@ -15,7 +14,7 @@ app.post('/hangqing', function(req, res) {
     var myMin = myDate.getMinutes();
     if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined || req.body.stockcode.length != 8) {
         res.end('error! invalid stock code or name');
-    } else if(myHour > 25 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
+    } else if(myHour > 15 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
         res.end('not work now!');
     } else {
         var stockcode = req.body.stockcode.substr(-6);
