@@ -5,17 +5,17 @@
     },
     "mysql" : {
         "host":"172.16.33.237",
-        "port":3306,  	
+        "port":3306,
         "user" : "stockradar",
         "password" : "stockradar",
-        "database": "stock_radar" 
+        "database": "stock_radar"
     },
     "log" : {
         "file" : "log/reciever.log"
     },
     "zjlx" : {
         "api" : "http://172.16.39.102/interface_zjlxjiekou.php?slishi=1&block=1&sday=1&code=",
-        "image" : "http://gupiao123.cn/stat/zjlx/"
+        "image" : "http://t.gupiao123.cn/zjlxImage.php?stockcode="
     },
     "pic" : {
         "folder" : "image"

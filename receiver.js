@@ -14,7 +14,7 @@ app.post('/hangqing', function(req, res) {
     var myMin = myDate.getMinutes();
     if(req.body.stockcode == undefined || req.body.name == undefined || req.body.date == undefined || req.body.stockcode.length != 8) {
         res.end('error! invalid stock code or name');
-    } else if(myHour > 25 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
+    } else if(myHour > 15 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
         res.end('not work now!');
     } else {
         var sToday = req.body.date.substr(0, 8);
@@ -113,7 +113,7 @@ app.post('/hangqing', function(req, res) {
                             zjShQuantiti = parseFloat(zjShQuantiti);
                         }
                         content += '【资金流向】净流量：' + zjQuantiti.toFixed(2) + '万元（机构：'+zjJgQuantiti.toFixed(2)+'万元，大户：'+zjDhQuantiti.toFixed(2)+'万元，散户：'+zjShQuantiti.toFixed(2)+'万元）';
-                        var imageUri = weibo.parseUrltoObj(settings.zjlx.image + stockcode + ".png");
+                        var imageUri = weibo.parseUrltoObj(settings.zjlx.image + stockcode);
                         getWeiboPicFolder(sToday, function(imageFolder) {
                             http.get(imageUri, function(resp) {
                                 var buffers = [], size = 0;
