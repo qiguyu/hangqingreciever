@@ -54,6 +54,8 @@ app.post('/hangqing', function(req, res) {
                     hqData.fudu = '大幅' + hqData.fudu;
                 }
             }
+            hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
+            hqData.openMarkup = Math.abs(hqData.openMarkup).toFixed(2);
             var content = template.display(tplName, hqData);
             weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
                 if(blogid > 0) {
