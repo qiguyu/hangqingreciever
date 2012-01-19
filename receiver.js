@@ -33,22 +33,22 @@ app.post('/hangqing', function(req, res) {
             if(Math.abs(hqData.hqMarkup) < 1) {
                 var fudu = '微幅';
                 if(hqData.hqMarkup < 0) {
-                    var zhangdie = '下跌';
+                    fudu += '下跌';
                 } else {
-                    var zhangdie = '上涨';
+                    fudu += '上涨';
                 }
             } else {
                 var fudu = '跳空';
                 if(hqData.hqMarkup < 0) {
-                    var zhangdie = '低开';
+                    fudu += '低开';
                 } else {
-                    var zhangdie = '高开';
+                    fudu += '高开';
                 }
                 if(Math.abs(hqData.hqMarkup) > 3) {
                     fudu = '大幅' + fudu;
                 }
             }
-            var content = '【开盘播报】'+req.body.name+'（'+stockcode+'）'+sDate+'开盘报'+hqData.hqPrice+'，较前一交易日'+fudu+'（'+zhangdie+'）'+hqData.hqUpdown+'元（'+hqData.hqPricePrefix+hqData.hqMarkup+'%）';
+            var content = '【开盘播报】'+req.body.name+'（'+stockcode+'）'+sDate+'开盘报'+hqData.hqPrice+'，较前一交易日'+fudu+hqData.hqUpdown+'元（'+hqData.hqPricePrefix+hqData.hqMarkup+'%）';
             weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
                 if(blogid > 0) {
                     res.end('success');
