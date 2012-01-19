@@ -1,0 +1,1 @@
+【开盘播报】{name}（{code}）{sDate}开盘报{open}，较前一交易日{fudu}{openUpown}元（{hqOpenPrefix}{openMarkup}%）

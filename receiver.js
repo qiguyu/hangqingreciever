@@ -1,6 +1,7 @@
 var settings = require('./etc/settings.json');
 var request = require('request');
 var weibo = require('./lib/weibo');
+var template = require('./lib/template');
 var http = require('http');
 var fs = require('fs');
 var path = require('path');
@@ -20,35 +21,40 @@ app.post('/hangqing', function(req, res) {
         var stockcode = req.body.stockcode.substr(-6);
         var sToday = req.body.date.substr(0, 8);
         var hqHour = parseInt(req.body.date.substr(8, 2));
-        if(hqHour < 11) {
-            var showtype = '开盘';
-        } else if(hqHour > 13) {
-            var showtype = '收盘';
-        } else {
-            var showtype = '午盘';
-        }
         var hqData = weibo.formatHqNumbers(req.body);
         if(hqHour < 11) {
-            var sDate = req.body.date.substr(4, 2)+'月'+req.body.date.substr(6, 2)+'日';
-            if(Math.abs(hqData.hqMarkup) < 1) {
-                var fudu = '微幅';
-                if(hqData.hqMarkup < 0) {
-                    fudu += '下跌';
+            hqData.showtype = '开盘';
+        } else if(hqHour > 13) {
+            hqData.showtype = '收盘';
+        } else {
+            hqData.showtype = '午盘';
+        }
+        if(hqHour < 11) {
+            hqData.name = req.body.name;
+            hqData.code = stockcode;
+            hqData.sDate = req.body.date.substr(4, 2)+'月'+req.body.date.substr(6, 2)+'日';
+            var tplName = 'kaipan.tpl';
+            if(hqData.openUpown == 0) {
+                var tplName = 'pingkai.tpl';
+            } else if(Math.abs(hqData.openMarkup) < 1) {
+                hqData.fudu = '微幅';
+                if(hqData.openMarkup < 0) {
+                    hqData.fudu += '下跌';
                 } else {
-                    fudu += '上涨';
+                    hqData.fudu += '上涨';
                 }
             } else {
-                var fudu = '跳空';
-                if(hqData.hqMarkup < 0) {
-                    fudu += '低开';
+                hqData.fudu = '跳空';
+                if(hqData.openMarkup < 0) {
+                    hqData.fudu += '低开';
                 } else {
-                    fudu += '高开';
+                    hqData.fudu += '高开';
                 }
-                if(Math.abs(hqData.hqMarkup) > 3) {
-                    fudu = '大幅' + fudu;
+                if(Math.abs(hqData.openMarkup) > 3) {
+                    hqData.fudu = '大幅' + hqData.fudu;
                 }
             }
-            var content = '【开盘播报】'+req.body.name+'（'+stockcode+'）'+sDate+'开盘报'+hqData.hqPrice+'，较前一交易日'+fudu+hqData.hqUpdown+'元（'+hqData.hqPricePrefix+hqData.hqMarkup+'%）';
+            var content = template.display(tplName, hqData);
             weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
                 if(blogid > 0) {
                     res.end('success');
@@ -57,9 +63,7 @@ app.post('/hangqing', function(req, res) {
                 }
             });
         } else {
-            var content = '【'+showtype+'播报】最新：'+hqData.hqPrice+'（'+hqData.hqPricePrefix+hqData.hqUpdown+'，'+hqData.hqPricePrefix+hqData.hqMarkup+'%），今开：'+hqData.hqOpen+'（'+hqData.hqOpenPrefix+hqData.openUpown+'，'+hqData.hqOpenPrefix+hqData.openMarkup+'%）';
-            content += '，最高：'+hqData.hqHigh+'（'+hqData.hqHighPrefix+hqData.highmarkup+'%），最低：'+hqData.hqLow+'（'+hqData.hqLowPrefix+hqData.lowmarkup+'%）';
-            content += '，成交：'+hqData.volum+'（'+hqData.amount+'），换手率：'+hqData.hqSwaprate+'%';
+            var content = template.display('shoupan.tpl', hqData);
             if( req.body.type == 1) {
                 request({ uri:settings.zjlx.api+stockcode }, function (error, response, body) {
                     if(error || response.statusCode != 200) {
@@ -68,21 +72,14 @@ app.post('/hangqing', function(req, res) {
                     try {
                         var oData = JSON.parse(body);
                         if(oData.message == undefined || oData.stock.datetime.substr(0, 8) == sToday) {
-                            var myPic = '';
                             var zjData = weibo.formatZjlxNumbers(oData);
-                            content += '【资金流向】净流量：' + zjData.zjQuantiti + '万元（机构：'+zjData.zjJgQuantiti+'万元，大户：'+zjData.zjDhQuantiti+'万元，散户：'+zjData.zjShQuantiti+'万元）';
-                            var imageUri = weibo.parseUrltoObj(settings.zjlx.image + stockcode);
-                            getWeiboPicFolder(sToday, function(imageFolder) {
-                                myPic = imageFolder+'/'+stockcode+'_zjlx_'+hqHour+'.png';
-                                fetchWeiboPic(imageUri, myPic, function() {
-                                    weibo.addWeibo(req.body.stockcode, content, myPic, function(blogid) {
-                                        if(blogid > 0) {
-                                            res.end('success');
-                                        } else {
-                                            res.end('error');
-                                        }
-                                    });
-                                });
+                            content += template.display('zjlx.tpl', zjData);
+                            weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
+                                if(blogid > 0) {
+                                    res.end('success');
+                                } else {
+                                    res.end('error');
+                                }
                             });
                         }
                     } catch(err) {
