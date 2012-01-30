@@ -30,7 +30,6 @@ app.post('/hangqing', function(req, res) {
             hqData.showtype = '午盘';
         }
         if(hqHour < 11) {
-            hqData.name = req.body.name;
             hqData.code = stockcode;
             hqData.sDate = req.body.date.substr(4, 2)+'月'+req.body.date.substr(6, 2)+'日';
             var tplName = 'kaipan.tpl';
@@ -66,7 +65,7 @@ app.post('/hangqing', function(req, res) {
             });
         } else {
             var content = template.display('shoupan.tpl', hqData);
-            if( req.body.type == 1) {
+            if( hqData.type == 1) {
                 request({ uri:settings.zjlx.api+stockcode }, function (error, response, body) {
                     if(error || response.statusCode != 200) {
                         console.log('request error:'+stockcode);
