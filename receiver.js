@@ -71,18 +71,20 @@ app.post('/hangqing', function(req, res) {
                         console.log('request error:'+stockcode);
                     }
                     try {
-                        var oData = JSON.parse(body);
-                        if(oData.message == undefined || oData.stock.datetime.substr(0, 8) == sToday) {
-                            var zjData = weibo.formatZjlxNumbers(oData);
-                            content += template.display('zjlx.tpl', zjData);
-                            weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
-                                if(blogid > 0) {
-                                    res.end('success');
-                                } else {
-                                    res.end('error');
-                                }
+                        var myPic = '';
+                        var imageUri = weibo.parseUrltoObj(settings.zjlx.image + stockcode);
+                        getWeiboPicFolder(sToday, function(imageFolder) {
+                            myPic = imageFolder+'/'+stockcode+'_zjlx_'+hqHour+'.png';
+                            fetchWeiboPic(imageUri, myPic, function() {
+                                weibo.addWeibo(req.body.stockcode, content, myPic, function(blogid) {
+                                    if(blogid > 0) {
+                                        res.end('success');
+                                    } else {
+                                        res.end('error');
+                                    }
+                                });
                             });
-                        }
+                        });
                     } catch(err) {
                         console.log('parse error12:'+stockcode);
                         weibo.addWeibo(req.body.stockcode, content, '', function(blogid) {
