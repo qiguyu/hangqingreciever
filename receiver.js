@@ -168,11 +168,15 @@ var composite = function(body, callback){
         var content = template.display('shoupan.tpl', hqData);
         if( hqData.type == 1) {
             getWeiboPicFolder(sToday, function(imageFolder) {
-                myPic = imageFolder+'/'+stockcode+'_zjlx_'+hqHour+'.png';
-                zjlx.drawZjlxImg(stockcode, myPic, function() {
-                    weibo.addWeibo(body.stockcode, content, myPic, function(blogid) {
-                        echoResult(blogid);
-                    });
+                var myPic = imageFolder+'/'+stockcode+'_zjlx_'+hqHour+'.png';
+                zjlx.drawZjlxImg(stockcode, myPic, function(err) {
+                    if(!err) {
+                        weibo.addWeibo(body.stockcode, content, myPic, function(blogid) {
+                            echoResult(blogid);
+                        });
+                    } else {
+                        echoResult(0);
+                    }
                 });
             });
         } else {

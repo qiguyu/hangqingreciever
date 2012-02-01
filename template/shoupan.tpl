@@ -1,1 +1,1 @@
-【{showtype}播报】最新{price}（{hqPricePrefix}{hqUpown}，{hqPricePrefix}{hqMarkup}%），今开：{open}（{hqOpenPrefix}{openUpown}，{hqOpenPrefix}{openMarkup}%），最高：{high}（{hqHighPrefix}{highmarkup}%），最低：{low}（{hqLowPrefix}{lowmarkup}%），成交：{volum}（{amount}），换手率：{swaprate}%
+【{showtype}播报】最新{price}（{hqPricePrefix}{hqUpown}，{hqPricePrefix}{hqMarkup}%），今开：{open}（{hqOpenPrefix}{openUpown}，{hqOpenPrefix}{openMarkup}%），最高：{high}（{hqHighPrefix}{highmarkup}%），最低：{low}（{hqLowPrefix}{lowmarkup}%），成交：{volum}（{amount}）
