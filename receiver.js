@@ -175,7 +175,9 @@ var composite = function(body, callback){
                             echoResult(blogid);
                         });
                     } else {
-                        echoResult(0);
+                        weibo.addWeibo(body.stockcode, content, '', function(blogid) {
+                            echoResult(blogid);
+                        });
                     }
                 });
             });
