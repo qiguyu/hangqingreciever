@@ -169,8 +169,10 @@ var composite = function(body, callback){
         if( hqData.type == 1) {
             getWeiboPicFolder(sToday, function(imageFolder) {
                 var myPic = imageFolder+'/'+stockcode+'_zjlx_'+hqHour+'.png';
-                zjlx.drawZjlxImg(stockcode, myPic, function(err) {
+                zjlx.drawZjlxImg(stockcode, myPic, function(err, oData) {
                     if(!err) {
+                        var zjData = weibo.formatZjlxNumbers(oData);
+                        content += template.display('zjlx.tpl', zjData);
                         weibo.addWeibo(body.stockcode, content, myPic, function(blogid) {
                             echoResult(blogid);
                         });

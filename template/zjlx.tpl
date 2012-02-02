@@ -1,1 +1,1 @@
-【资金流向】净流量：{zjQuantiti}万元（机构：{zjJgQuantiti}万元，大户：{zjDhQuantiti}万元，散户：{zjShQuantiti}万元）
+【资金流向】净流量：{zjQuantiti}万元
