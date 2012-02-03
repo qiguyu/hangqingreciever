@@ -77,9 +77,7 @@ app.post('/weibo', function(req, res) {
 app.listen(9559);
 
 var composite = function(body, callback){
-    var si = setTimeout(callback, 30000);
     var echoResult = function(blogid, content, image){
-        clearTimeout(si);
         if(blogid > 0) {
             console.log('[message] receive hangqing success,blogid:' + blogid + ',content:'+content+',image:'+image+',stockcode:'+stockcode);
         } else {
