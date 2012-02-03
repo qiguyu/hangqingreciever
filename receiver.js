@@ -75,7 +75,7 @@ var composite = function(body, callback){
     var echoResult = function(blogid, content, image){
         clearTimeout(si);
         if(blogid > 0) {
-            console.log('[message] receive hangqing success,blog id is ' + blogid + ',content:'+content+'image:'+image);
+            console.log('[message] receive hangqing success,blogid:' + blogid + ',content:'+content+',image:'+image+',stockcode:'+stockcode);
         } else {
             console.log('[error] receive hangqing failure:' + JSON.stringify(body));
         }   
