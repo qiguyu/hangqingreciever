@@ -154,3 +154,4 @@ var composite = function(body, callback){
 }
 
 var hqQueue = async.queue(composite, 5);
+console.log('[debug] service start success!');
