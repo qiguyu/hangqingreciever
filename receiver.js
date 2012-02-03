@@ -16,6 +16,12 @@ weibo.getAccounts(function(err, acc){
     }
     accounts = acc; 
 });
+template.loadTemplates(function(err) {
+    if(err) {
+        console.log(['[error] load template error:', err]);
+        return;
+    }
+});
 
 var async = require('async');
 
