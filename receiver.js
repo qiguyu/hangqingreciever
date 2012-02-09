@@ -14,7 +14,7 @@ weibo.getAccounts(function(err, acc){
         console.log(['[error] load valid stock_code error:', err]);
         return;
     }
-    accounts = acc; 
+    accounts = acc;
 });
 template.loadTemplates(function(err) {
     if(err) {
@@ -82,7 +82,7 @@ var composite = function(body, callback){
             console.log('[message] receive hangqing success,blogid:' + blogid + ',content:'+content+',image:'+image+',stockcode:'+stockcode);
         } else {
             console.log('[error] receive hangqing failure:' + JSON.stringify(body));
-        }   
+        }
         console.log('[debug] current queue length:'+hqQueue.length());
         callback();
     }
@@ -98,35 +98,39 @@ var composite = function(body, callback){
         hqData.showtype = '午盘';
     }
     if(hqHour < 11) {
-        hqData.code = stockcode;
-        hqData.sDate = body.date.substr(4, 2)+'月'+body.date.substr(6, 2)+'日';
-        var tplName = 'kaipan.tpl';
-        if(hqData.openUpown == 0) {
-            var tplName = 'pingkai.tpl';
-        } else if(Math.abs(hqData.openMarkup) < 1) {
-            hqData.fudu = '微幅';
-            if(hqData.openMarkup < 0) {
-                hqData.fudu += '下跌';
-            } else {
-                hqData.fudu += '上涨';
-            }
+        if(hqData.open == 0.00) {
+            console.log('[warning] open is zero! body:' + JSON.stringify(body));
         } else {
-            hqData.fudu = '跳空';
-            if(hqData.openMarkup < 0) {
-                hqData.fudu += '低开';
+            hqData.code = stockcode;
+            hqData.sDate = body.date.substr(4, 2)+'月'+body.date.substr(6, 2)+'日';
+            var tplName = 'kaipan.tpl';
+            if(hqData.openUpown == 0) {
+                var tplName = 'pingkai.tpl';
+            } else if(Math.abs(hqData.openMarkup) < 1) {
+                hqData.fudu = '微幅';
+                if(hqData.openMarkup < 0) {
+                    hqData.fudu += '下跌';
+                } else {
+                    hqData.fudu += '上涨';
+                }
             } else {
-                hqData.fudu += '高开';
+                hqData.fudu = '跳空';
+                if(hqData.openMarkup < 0) {
+                    hqData.fudu += '低开';
+                } else {
+                    hqData.fudu += '高开';
+                }
+                if(Math.abs(hqData.openMarkup) > 3) {
+                    hqData.fudu = '大幅' + hqData.fudu;
+                }
             }
-            if(Math.abs(hqData.openMarkup) > 3) {
-                hqData.fudu = '大幅' + hqData.fudu;
-            }
+            hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
+            hqData.openMarkup = Math.abs(hqData.openMarkup).toFixed(2);
+            var content = template.display(tplName, hqData);
+            weibo.addWeibo(body.stockcode, content, '', function(blogid) {
+                echoResult(blogid, content, '');
+            });
         }
-        hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
-        hqData.openMarkup = Math.abs(hqData.openMarkup).toFixed(2);
-        var content = template.display(tplName, hqData);
-        weibo.addWeibo(body.stockcode, content, '', function(blogid) {
-            echoResult(blogid, content, '');
-        });
     } else {
         var content = template.display('shoupan.tpl', hqData);
         if( hqData.type == 1) {
@@ -148,7 +152,7 @@ var composite = function(body, callback){
                 echoResult(blogid, content, '');
             });
         }
-    }   
+    }
 }
 
 var hqQueue = async.queue(composite, 5);
