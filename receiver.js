@@ -134,7 +134,8 @@ var composite = function(body, callback){
     } else {
         var content = template.display('shoupan.tpl', hqData);
         if( hqData.type == 1) {
-            zjlx.drawZjlxImg(stockcode, function(err, oData, myPic) {
+            hqData.sDate = body.date.substr(0, 4)+'-'+body.date.substr(4, 2)+'-'+body.date.substr(6, 2)+' '+body.date.substr(8, 2)+':'+body.date.substr(10, 2)+':00';
+            zjlx.drawZjlxImg(stockcode, hqData, function(err, oData, myPic) {
                 if(!err) {
                     var zjData = weibo.formatZjlxNumbers(oData);
                     content += template.display('zjlx.tpl', zjData);
