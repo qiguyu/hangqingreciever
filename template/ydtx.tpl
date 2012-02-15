@@ -1,0 +1,1 @@
+【异动雷达】{stockname}（{stockcode}）{showtype}异动，最新：{currentprice}元，{showtext}：{value}

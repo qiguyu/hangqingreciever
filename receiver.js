@@ -2,6 +2,7 @@ var settings = require('./etc/settings.json');
 var request = require('request');
 var weibo = require('./lib/weibo');
 var zjlx = require('./lib/zjlx');
+var ydtx = require('./lib/ydtx');
 var template = require('./lib/template');
 var http = require('http');
 var path = require('path');
@@ -15,12 +16,14 @@ weibo.getAccounts(function(err, acc){
         return;
     }
     accounts = acc;
+    console.log('[debug] accounts load success!');
 });
 template.loadTemplates(function(err) {
     if(err) {
         console.log(['[error] load template error:', err]);
         return;
     }
+    console.log('[debug] templates load success!');
 });
 
 var async = require('async');
@@ -42,6 +45,32 @@ app.post('/hangqing', function(req, res) {
         res.end('success');
     }
 });
+app.post('/yidong', function(req, res) {
+    var myDate = new Date();
+    var myHour = myDate.getHours();
+    var myMin = myDate.getMinutes();
+    var ydBody = {};
+    for(var k in req.body) {
+        try {
+            ydBody = JSON.parse(k);
+        } catch(err) {
+            ydBody = req.body;
+            break;
+        }
+    }
+    if(!ydBody.stockcode || ydBody.stockname == undefined || ydBody.date == undefined || ydBody.stockcode.length != 6) {
+        console.log('[error][yidong] invalid stock code or name:', JSON.stringify(ydBody));
+        res.end('error! invalid stock code or name');
+    } else if(myHour > 15 || myHour < 9 || (myHour == 15 && myMin > 30) || (myHour == 9 && myMin < 20)) {
+        res.end('not work now!');
+    } else {
+        ydBody['stock_code'] = ydBody.market.toLowerCase() + ydBody.stockcode.toLowerCase();
+        if(accounts && accounts[ydBody['stock_code']]){
+            ydtx.addYdtx(ydBody['stock_code'], ydBody);
+        }
+        res.end('success');
+    }
+});
 app.post('/weibo', function(req, res) {
     if(req.body.stockcode == undefined || req.body.content == undefined || req.body.stockcode.length != 8) {
         res.end('invalied stockcode or content!');
@@ -54,7 +83,7 @@ app.post('/weibo', function(req, res) {
             weibo.getWeiboPicFolder(function(imageFolder) {
                 var myPic = imageFolder+'/'+stockcode+'_'+nowTime+extName;
                 weibo.fetchWeiboPic(imageUri, myPic, function() {
-                    weibo.addWeibo(req.body.stockcode, req.body.content, myPic, function(blogid) {
+                    weibo.addWeibo(req.body.stockcode, req.body.content, myPic, 1, function(blogid) {
                         if(blogid > 0) {
                             res.end('success');
                         } else {
@@ -64,7 +93,7 @@ app.post('/weibo', function(req, res) {
                 });
             });
         } else {
-            weibo.addWeibo(req.body.stockcode, req.body.content, '', function(blogid) {
+            weibo.addWeibo(req.body.stockcode, req.body.content, '', 1, function(blogid) {
                 if(blogid > 0) {
                     res.end('success');
                 } else {
@@ -92,10 +121,13 @@ var composite = function(body, callback){
     var hqData = weibo.formatHqNumbers(body);
     if(hqHour < 11) {
         hqData.showtype = '开盘';
+        var contentType = 2;
     } else if(hqHour > 13) {
         hqData.showtype = '收盘';
+        var contentType = 4;
     } else {
         hqData.showtype = '午盘';
+        var contentType = 3;
     }
     if(hqHour < 11) {
         if(hqData.open == 0.00) {
@@ -127,7 +159,7 @@ var composite = function(body, callback){
             hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
             hqData.openMarkup = Math.abs(hqData.openMarkup).toFixed(2);
             var content = template.display(tplName, hqData);
-            weibo.addWeibo(body.stockcode, content, '', function(blogid) {
+            weibo.addWeibo(body.stockcode, content, '', contentType, function(blogid) {
                 echoResult(blogid, content, '');
             });
         }
@@ -139,17 +171,17 @@ var composite = function(body, callback){
                 if(!err) {
                     var zjData = weibo.formatZjlxNumbers(oData);
                     content += template.display('zjlx.tpl', zjData);
-                    weibo.addWeibo(body.stockcode, content, myPic, function(blogid) {
+                    weibo.addWeibo(body.stockcode, content, myPic, contentType, function(blogid) {
                         echoResult(blogid, content, myPic);
                     });
                 } else {
-                    weibo.addWeibo(body.stockcode, content, '', function(blogid) {
+                    weibo.addWeibo(body.stockcode, content, '', contentType, function(blogid) {
                         echoResult(blogid, content, '');
                     });
                 }
             });
         } else {
-            weibo.addWeibo(body.stockcode, content, '', function(blogid) {
+            weibo.addWeibo(body.stockcode, content, '', contentType, function(blogid) {
                 echoResult(blogid, content, '');
             });
         }
