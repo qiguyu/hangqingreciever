@@ -121,13 +121,13 @@ var composite = function(body, callback){
     var hqData = weibo.formatHqNumbers(body);
     if(hqHour < 11) {
         hqData.showtype = '开盘';
-        var contentType = 2;
+        var contentType = 'hq_kaipan';
     } else if(hqHour > 13) {
         hqData.showtype = '收盘';
-        var contentType = 4;
+        var contentType = 'hq_shoupan';
     } else {
         hqData.showtype = '午盘';
-        var contentType = 3;
+        var contentType = 'hq_wupan';
     }
     if(hqHour < 11) {
         if(hqData.open == 0.00) {
