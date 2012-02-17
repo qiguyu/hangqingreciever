@@ -1,5 +1,4 @@
 var settings = require('./etc/settings.json');
-var request = require('request');
 var weibo = require('./lib/weibo');
 var zjlx = require('./lib/zjlx');
 var ydtx = require('./lib/ydtx');
@@ -102,6 +101,15 @@ app.post('/weibo', function(req, res) {
             });
         }
     }
+});
+app.get('/latest', function(req, res) {
+    weibo.getLatest(req.query, function(error, data) {
+        if(error) {
+            res.send(JSON.stringify({'error':1, 'msg':error}));
+        } else {
+            res.send(data);
+        }
+    });
 });
 app.listen(9559);
 
