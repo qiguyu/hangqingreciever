@@ -82,7 +82,7 @@ app.post('/weibo', function(req, res) {
             weibo.getWeiboPicFolder(function(imageFolder) {
                 var myPic = imageFolder+'/'+stockcode+'_'+nowTime+extName;
                 weibo.fetchWeiboPic(imageUri, myPic, function() {
-                    weibo.addWeibo(req.body.stockcode, req.body.content, myPic, 1, function(blogid) {
+                    weibo.addWeibo(req.body.stockcode, req.body.content, myPic, 'zixun', function(blogid) {
                         if(blogid > 0) {
                             res.end('success');
                         } else {
@@ -103,6 +103,14 @@ app.post('/weibo', function(req, res) {
     }
 });
 app.get('/latest', function(req, res) {
+    var cnt = req.query.cnt || 30;
+    if(typeof cnt != 'int') {
+        cnt = parseInt(cnt);
+    }
+    if(cnt > 100 || cnt < 1) {
+        cnt = 100;
+    }
+    req.query.cnt = cnt;
     weibo.getLatest(req.query, function(error, data) {
         if(error) {
             res.send({'error':1, 'msg':error});
@@ -113,6 +121,23 @@ app.get('/latest', function(req, res) {
 });
 app.get('/account', function(req, res) {
     weibo.getAccountList(function(error, data) {
+        if(error) {
+            res.send({'error':1, 'msg':error});
+        } else {
+            res.send(data);
+        }
+    });
+});
+app.get('/hot', function(req, res) {
+    var cnt = req.query.cnt || 10;
+    if(typeof cnt != 'int') {
+        cnt = parseInt(cnt);
+    }
+    if(cnt > 30 || cnt < 1) {
+        cnt = 30;
+    }
+    req.query.cnt = cnt;
+    weibo.getHotList(req.query, function(error, data) {
         if(error) {
             res.send({'error':1, 'msg':error});
         } else {

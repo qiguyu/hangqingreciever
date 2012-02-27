@@ -26,6 +26,10 @@ vi settings.json
         "password" : "stockradar",
         "database": "stock_radar" 
     },
+    "redis" : {
+        "host":"localhost",
+        "port":6379
+    },
     "log" : {
         "file" : "log/reciever.log"
     },
