@@ -203,7 +203,6 @@ var composite = function(body, callback){
                 hqData.hqOpenPrefix = '+';
             }
             hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
-            hqData.openMarkup = hqData.openMarkup.toFixed(2);
             var content = template.display(tplName, hqData);
             weibo.addWeibo(body.stockcode, content, '', contentType, function(blogid) {
                 echoResult(blogid, content, '');
