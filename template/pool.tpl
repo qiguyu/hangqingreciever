@@ -1,0 +1,1 @@
+【{type}潜力金股】{name}（{code}）最新：{price}元，涨幅：{markup}%，成交量：{volum}手，成交金额：{amount}元，资金流向：{zjlx}元，买卖提示：{sellbuy}。
