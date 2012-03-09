@@ -90,7 +90,7 @@ var stockpond = function() {
     var hh = myDate.getHours();
     var ww = myDate.getDay();
     var date = yyyy + (mm[1]?mm:"0"+mm[0]) + (dd[1]?dd:"0"+dd[0]);
-    if(ww > 0 && ww < 6 && hh > 8 && hh < 21) {
+    if(ww > 0 && ww < 6 && hh > 9 && hh < 16) {
         console.log('[debug] stock pool running');
         for(var k in pool_interface) {
             (function(key) {
