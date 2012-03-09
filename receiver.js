@@ -198,8 +198,12 @@ var composite = function(body, callback){
                     hqData.fudu = '大幅' + hqData.fudu;
                 }
             }
+            hqData.hqOpenPrefix = '';
+            if(hqData.openUpown > 0) {
+                hqData.hqOpenPrefix = '+';
+            }
             hqData.openUpown = Math.abs(hqData.openUpown).toFixed(2);
-            hqData.openMarkup = Math.abs(hqData.openMarkup).toFixed(2);
+            hqData.openMarkup = hqData.openMarkup.toFixed(2);
             var content = template.display(tplName, hqData);
             weibo.addWeibo(body.stockcode, content, '', contentType, function(blogid) {
                 echoResult(blogid, content, '');
