@@ -10,7 +10,19 @@ var lhb_interface = [{'url' : 'http://172.16.39.102/Hszqxx.php', 'type' : 'sh'},
 var pool_interface = { 'long' : {'url':'http://172.16.39.102/zsw/poolml.json', 'type':'长线'},
                        'middle' : {'url':'http://172.16.39.102/zsw/poolsh.json', 'type':'中长线'},
                        'short' : {'url':'http://172.16.39.102/zsw/poolms.json', 'type':'中短线'}};
+var znz_wave2_interface = 'http://topdata.compass.cn/test/zsw.py/data?cmd=[%stockid%,103,0,0,4294967295,999999,-1]|';
 
+var wave2index = 0;
+var accounts; //保存所有有账号的股票代码
+weibo.getZnzLists(function(err, acc){
+    if(err){
+        console.log(['[error] load valid stock_code error:', err]);
+        return;
+    }
+    accounts = acc;
+    console.log('[debug] accounts load success!');
+    bigbuysell();
+});
 template.loadTemplates(function(err) {
     if(err) {
         console.log(['[error] load template error:', err]);
@@ -21,13 +33,19 @@ template.loadTemplates(function(err) {
     stockpond();
 });
 
-var getDataFromUrl = function(url, cb) {
+var getDataFromUrl = function(url, substr, cb) {
     request({ uri:url, timeout:60000 }, function (error, response, body) {
         if(error || response.statusCode != 200) {
             console.log('[error] data request error! url:'+url+', message:'+error);
             cb(error, 'stock api request error!');
         } else {
             try {
+                if(substr == 1) {
+                    if(body == '403') {
+                        body = '[]0';
+                    }
+                    body = body.substr(0, body.length-1);
+                }
                 var oData = JSON.parse(body);
                 cb(null, oData);
             } catch(err) {
@@ -50,7 +68,7 @@ var stockLhb = function() {
         console.log('[debug] lhb running');
         for(var k in lhb_interface) {
             (function(key) {
-                getDataFromUrl(lhb_interface[key].url, function(error,data) {
+                getDataFromUrl(lhb_interface[key].url, 0, function(error,data) {
                     if(date == data.datatime) {
                         var keyType = lhb_interface[key].type;
                         if(!error) {
@@ -94,7 +112,7 @@ var stockpond = function() {
         console.log('[debug] stock pool running');
         for(var k in pool_interface) {
             (function(key) {
-                getDataFromUrl(pool_interface[key].url, function(error,data) {
+                getDataFromUrl(pool_interface[key].url, 0, function(error,data) {
                     var rawdata = data.datatable.datavalue;
                     if(!error) {
                         for(var i = 0,len = rawdata.length;i < len;i++) {
@@ -124,6 +142,63 @@ var stockpond = function() {
             })(k);
         }
     }
+}
+
+var bigbuysell = function() {
+    console.log('[debug] bigbuy&sell running');
+    getWave2Data();
+}
+
+var getWave2Data = function() {
+    setTimeout(function() {
+        var myDate = new Date();
+        var yyyy = myDate.getFullYear().toString();
+        var mm = (myDate.getMonth()+1).toString();
+        var dd  = myDate.getDate().toString();
+        var hh = myDate.getHours();
+        var ww = myDate.getDay();
+        var date = yyyy + (mm[1]?mm:"0"+mm[0]) + (dd[1]?dd:"0"+dd[0]);
+        if(ww > 0 && ww < 6 && hh > 9 && hh < 24 && accounts[wave2index]['id'] != 0) {
+            var znz_wave2_url = znz_wave2_interface.replace(/%stockid%/g, accounts[wave2index]['id']);
+            var stockcode = accounts[wave2index]['code'];
+            var iFlag = Math.round(Math.random()*1000);
+            getDataFromUrl(znz_wave2_url+iFlag, 1, function(error,data) {
+                if(!error) {
+                    lhb.formatWave2Numbers(stockcode, data, function(ddcjData) {
+                        for(var i = 0;i < ddcjData.length;i++) {
+                            (function(i) {
+                                if(ddcjData[i].buyvolum > 0 || ddcjData[i].sellvolum > 0) {
+                                    var content = template.display('ddcj.tpl', ddcjData[i]);
+                                    var contentType = 'dadan_'+ddcjData[i].content_type;
+                                    lhb.addWave2Data(ddcjData[i], contentType, stockcode, content, function(blogid) {
+                                        if(blogid > 0) {
+                                            console.log('[message] wave2 success,blogid:' + blogid + ',content:'+content+',stockcode:'+stockcode);
+                                        } else if(blogid == 0) {
+                                            console.log('[error] wave2 failure: code:' + stockcode + ', type:' + contentType);
+                                        }
+                                    });
+                                }
+                            })(i);
+                        }
+                        if(++wave2index == accounts.length) {
+                            wave2index = 0;
+                        }
+                        getWave2Data();
+                    });
+                } else {
+                    if(++wave2index == accounts.length) {
+                        wave2index = 0;
+                    }
+                    getWave2Data();
+                }
+            });
+        } else {
+            if(++wave2index == accounts.length) {
+                wave2index = 0;
+            }
+            getWave2Data();
+        }
+    }, 500);
 }
 
 setInterval(function(){
