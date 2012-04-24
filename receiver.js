@@ -161,6 +161,7 @@ var composite = function(body, callback){
     var sToday = body.date.substr(0, 8);
     var hqHour = parseInt(body.date.substr(8, 2));
     var hqData = weibo.formatHqNumbers(body);
+    hqData.code = stockcode;
     if(hqHour < 11) {
         hqData.showtype = '开盘';
         var contentType = 'hq_kaipan';
@@ -175,7 +176,6 @@ var composite = function(body, callback){
         if(hqData.open == 0.00) {
             console.log('[warning] open is zero! body:' + JSON.stringify(body));
         } else {
-            hqData.code = stockcode;
             hqData.sDate = body.date.substr(4, 2)+'月'+body.date.substr(6, 2)+'日';
             var tplName = 'kaipan.tpl';
             if(hqData.openUpown == 0) {
