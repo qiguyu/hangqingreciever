@@ -1,1 +1,1 @@
-【大单成交】截至{ddHour}时{ddMin}分，{type}累计买入{buyvolum}手（{buyamount}元），累计卖出{sellvolum}手（{sellamount}元）。
+#大单成交#截至{ddHour}时{ddMin}分，{type}累计买入{buyvolum}手（{buyamount}元），累计卖出{sellvolum}手（{sellamount}元）。

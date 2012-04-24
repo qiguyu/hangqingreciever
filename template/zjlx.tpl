@@ -1,1 +1,1 @@
-【资金流向】净流量：{zjQuantiti}万元
+#资金流向#净流量：{zjQuantiti}万元

@@ -1,1 +1,1 @@
-【异动雷达】截至{ydHour}时{ydMin}分，{stockname}（{stockcode}）{showtype}异动，最新：{currentprice}元，换手：{swaprate}%，涨幅：{updown}%，振幅：{markup}%
+#异动雷达#截至{ydHour}时{ydMin}分，{stockname}（{stockcode}）{showtype}异动，最新：{currentprice}元，换手：{swaprate}%，涨幅：{updown}%，振幅：{markup}%
